@@ -1,0 +1,57 @@
+static_resources:
+  listeners:
+    - name: listener_0
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8085  # Port where Envoy listens for incoming gRPC-Web requests
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: ingress_http
+                codec_type: AUTO
+                route_config:
+                  name: local_route
+                  virtual_hosts:
+                    - name: backend
+                      domains: ["*"]
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: java_backend
+                            cors:
+                              allow_origin_string_match:
+                                - exact: "http://localhost:8081"  # Matches your frontend
+                              allow_methods: "GET, POST, OPTIONS"
+                              allow_headers: "content-type, x-grpc-web, authorization, x-user-agent"
+                              expose_headers: "grpc-status, grpc-message"
+                              max_age: "86400"
+                              allow_credentials: true
+                http_filters:
+                  - name: envoy.filters.http.cors
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+                  - name: envoy.filters.http.grpc_web
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  clusters:
+    - name: java_backend
+      connect_timeout: 0.5s
+      type: logical_dns
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: java_backend
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: localhost  # Address of your Java backend
+                      port_value: 8080    # Port where your Java backend is listening
+      http2_protocol_options: {}  # Enable HTTP/2 for the backend without TLS
