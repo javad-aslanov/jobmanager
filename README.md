@@ -77,11 +77,6 @@ Start the gRPC backend service with the following command:
 mvn exec:java -Dexec.mainClass="com.example.jobmanager.JobManagerServer"
 ```
 
-**Notes:**
-
-- Replace `com.example.jobmanager.JobManagerServer` with the actual main class of your backend application if it's different.
-- The backend service listens on **port 8080** by default.
-- **This service must be run first** to ensure it is ready to receive requests.
 
 ---
 
