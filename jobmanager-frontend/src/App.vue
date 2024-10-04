@@ -9,7 +9,6 @@
       </li>
     </ul>
 
-    <!-- Job Details Modal -->
     <div v-if="selectedJob" class="job-details-modal">
       <div class="job-details-content">
         <h2>Job Details</h2>
@@ -17,7 +16,6 @@
         <p><strong>Job Name:</strong> {{ selectedJob.jobname }}</p>
         <p><strong>Status:</strong> {{ jobStatusToString(selectedJob.jobstatus) }}</p>
         <p><strong>Creation Date:</strong> {{ selectedJob.creationdate }}</p>
-        <!-- Add more job details as needed -->
         <button @click="closeJobDetails" class="close-button">Close</button>
       </div>
     </div>
@@ -61,11 +59,9 @@ export default {
       return JobStatus[status] || 'UNKNOWN';
     },
     selectJob(job) {
-      // Set the clicked job as the selected job to display its details
       this.selectedJob = job;
     },
     closeJobDetails() {
-      // Close the job details modal
       this.selectedJob = null;
     }
   }
